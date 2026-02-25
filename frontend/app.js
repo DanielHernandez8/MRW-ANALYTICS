@@ -1,5 +1,6 @@
 const DOM = {
   fileInput: document.getElementById("csvFile"),
+  loadedFileName: document.getElementById("loadedFileName"),
   analyzeBtn: document.getElementById("analyzeBtn"),
   demoFileBtn: document.getElementById("demoFileBtn"),
   sensitiveToggleBtn: document.getElementById("sensitiveToggle"),
@@ -82,6 +83,12 @@ function updateExclusionSummary() {
 
 function setStatus(text) {
   DOM.statusText.textContent = text;
+}
+
+function setLoadedFileName(name) {
+  DOM.loadedFileName.textContent = name
+    ? `Archivo cargado: ${name}`
+    : "Ningun archivo cargado.";
 }
 
 function setLoading(isLoading) {
@@ -444,6 +451,7 @@ async function loadDemoFile() {
     if (!res.ok) throw new Error("No se pudo cargar el CSV de prueba.");
     const blob = await res.blob();
     state.cachedFile = new File([blob], "demo_mrw_ficticio.csv", { type: "text/csv" });
+    setLoadedFileName(state.cachedFile.name);
     setStatus("Fichero de prueba cargado. Analizando demo...");
     await analyze();
   } catch (error) {
@@ -531,6 +539,7 @@ function setupExclusionDropdown() {
 function setupBaseEvents() {
   DOM.fileInput.addEventListener("change", () => {
     state.cachedFile = DOM.fileInput.files[0] || null;
+    setLoadedFileName(state.cachedFile?.name || "");
   });
   DOM.analyzeBtn.addEventListener("click", analyze);
   DOM.demoFileBtn.addEventListener("click", loadDemoFile);
@@ -545,6 +554,7 @@ function init() {
   setupSensitiveToggle();
   setupExclusionDropdown();
   updateExclusionSummary();
+  setLoadedFileName("");
 }
 
 init();

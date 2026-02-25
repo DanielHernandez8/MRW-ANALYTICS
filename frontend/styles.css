@@ -152,6 +152,13 @@ select {
   padding: 0.55rem 0.75rem;
 }
 
+#loadedFileName {
+  margin-top: 0.2rem;
+  display: block;
+  color: #2f4568;
+  font-weight: 500;
+}
+
 input[type="file"]::file-selector-button {
   border: 1px solid rgba(18, 35, 61, 0.2);
   background: #f3f8ff;

@@ -28,10 +28,16 @@ const DOM = {
 };
 
 const CONFIG = {
-  apiUrl:
-    window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost"
-      ? "http://127.0.0.1:8000/api/rentabilidad/analyze"
-      : "/api/rentabilidad/analyze",
+  apiUrl: (() => {
+    const configuredBase = window.APP_CONFIG?.backendBaseUrl?.trim();
+    if (configuredBase && !configuredBase.includes("TU-BACKEND.onrender.com")) {
+      return `${configuredBase.replace(/\/$/, "")}/api/rentabilidad/analyze`;
+    }
+    if (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost") {
+      return "http://127.0.0.1:8000/api/rentabilidad/analyze";
+    }
+    return "/api/rentabilidad/analyze";
+  })(),
   demoCsvUrl: "./assets/demo_mrw_ficticio.csv",
   sensitiveMask: "******",
 };
@@ -393,6 +399,19 @@ function buildAnalyzeFormData() {
   return formData;
 }
 
+async function parseApiResponse(res) {
+  const contentType = res.headers.get("content-type") || "";
+  if (contentType.includes("application/json")) {
+    return await res.json();
+  }
+
+  const text = await res.text();
+  const preview = text.slice(0, 180).replace(/\s+/g, " ").trim();
+  throw new Error(
+    `Respuesta no valida del backend (${res.status}). Revisa APP_CONFIG.backendBaseUrl. Recibido: ${preview}`
+  );
+}
+
 async function analyze() {
   if (!state.cachedFile) {
     setStatus("Selecciona primero un archivo CSV.");
@@ -407,7 +426,7 @@ async function analyze() {
       method: "POST",
       body: buildAnalyzeFormData(),
     });
-    const payload = await res.json();
+    const payload = await parseApiResponse(res);
     if (!res.ok) throw new Error(payload.detail || "Error inesperado.");
     onAnalyzeSuccess(payload);
   } catch (error) {

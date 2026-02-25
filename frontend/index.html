@@ -1,0 +1,150 @@
+﻿<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MRW Rentabilidad Dashboard</title>
+    <link rel="icon" type="image/x-icon" href="./assets/mrw.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body>
+    <div class="bg-shape bg-shape-a"></div>
+    <div class="bg-shape bg-shape-b"></div>
+
+    <main class="container">
+      <header class="hero">
+        <div class="hero-top">
+          <img class="hero-logo" src="./assets/mrw-logo.png" alt="Logo MRW" />
+          <p class="eyebrow">MRW Analytics</p>
+        </div>
+        <h1>Rentabilidad por abonado</h1>
+        <p class="subtitle">Dashboard web con CSV mensual, exclusiones y simulacion anual.</p>
+      </header>
+
+      <section class="panel controls">
+        <div class="control">
+          <label for="csvFile">CSV MRW</label>
+          <div class="file-actions">
+            <input id="csvFile" type="file" accept=".csv" />
+            <button id="demoFileBtn" type="button" class="secondary-btn">Cargar fichero de prueba</button>
+          </div>
+        </div>
+        <div class="control">
+          <label>Abonados a excluir</label>
+          <div class="excluir-dropdown" id="excluirDropdown">
+            <button id="excluirToggle" type="button" class="excluir-toggle">
+              <span id="excluirSummary">Seleccionar abonados</span>
+              <span class="chevron">▾</span>
+            </button>
+            <div id="excluirPanel" class="excluir-panel" hidden>
+              <div id="excluirList" class="excluir-list"></div>
+            </div>
+          </div>
+          <small>Puedes marcar varios abonados.</small>
+        </div>
+        <div class="control action-box">
+          <button id="analyzeBtn">Analizar</button>
+          <button id="sensitiveToggle" type="button" class="secondary-btn">Ocultar datos sensibles</button>
+        </div>
+        <p id="status"></p>
+      </section>
+
+      <section class="panel options-panel">
+        <label class="option-check">
+          <input id="escenarioAnual" type="checkbox" />
+          Escenario anual estimado (12 meses)
+        </label>
+        <p class="warning-note">
+          Advertencia: el escenario anual es una estimacion orientativa (mes x 12) y no representa datos reales.
+        </p>
+      </section>
+
+      <section class="kpis">
+        <article class="panel kpi-card">
+          <h3>PV total</h3>
+          <p id="kpiPv" class="sensitive">-</p>
+        </article>
+        <article class="panel kpi-card">
+          <h3>Coste total</h3>
+          <p id="kpiCoste" class="sensitive">-</p>
+        </article>
+        <article class="panel kpi-card">
+          <h3>Margen total</h3>
+          <p id="kpiMargen" class="sensitive">-</p>
+        </article>
+        <article class="panel kpi-card">
+          <h3>Rentabilidad media</h3>
+          <p id="kpiRent" class="sensitive">-</p>
+        </article>
+      </section>
+
+      <section class="charts sensitive-chart">
+        <article class="panel">
+          <h3>Top 10 margen</h3>
+          <canvas id="chartMargen"></canvas>
+        </article>
+        <article class="panel">
+          <h3>PV vs Coste</h3>
+          <canvas id="chartPvCoste"></canvas>
+        </article>
+        <article class="panel">
+          <h3>Top 10 rentabilidad %</h3>
+          <canvas id="chartRentabilidad"></canvas>
+        </article>
+      </section>
+
+      <section class="panel table-wrap">
+        <div class="table-head">
+          <h3>Detalle por abonado</h3>
+          <div class="table-tools">
+            <input id="globalSearch" type="text" placeholder="Buscar en toda la tabla..." />
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table id="resultsTable">
+            <thead>
+              <tr>
+                <th data-key="abonado" class="sortable">Abonado</th>
+                <th data-key="razon_social" class="sortable">Razon social</th>
+                <th data-key="pv" class="sortable">PV</th>
+                <th data-key="coste" class="sortable">Coste</th>
+                <th data-key="margen" class="sortable">Margen</th>
+                <th data-key="rentabilidad_pct" class="sortable">Rentabilidad %</th>
+              </tr>
+              <tr class="filter-row">
+                <th><input data-filter="abonado" placeholder="Filtrar..." /></th>
+                <th><input data-filter="razon_social" placeholder="Filtrar..." /></th>
+                <th><input data-filter="pv" placeholder="Filtrar..." /></th>
+                <th><input data-filter="coste" placeholder="Filtrar..." /></th>
+                <th><input data-filter="margen" placeholder="Filtrar..." /></th>
+                <th><input data-filter="rentabilidad_pct" placeholder="Filtrar..." /></th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div class="pager">
+          <button id="prevPage" type="button">Anterior</button>
+          <span id="pageInfo">Pagina 1</span>
+          <button id="nextPage" type="button">Siguiente</button>
+          <select id="pageSize">
+            <option value="10">10 / pagina</option>
+            <option value="25" selected>25 / pagina</option>
+            <option value="50">50 / pagina</option>
+            <option value="100">100 / pagina</option>
+          </select>
+        </div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
+
